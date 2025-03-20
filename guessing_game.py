@@ -4,6 +4,23 @@ from tkinter import messagebox
 import subprocess
 import os
 import sys
+import urllib.request
+
+# --- Auto-updater ---
+CURRENT_VERSION = "1.0.2"
+CODE_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/refs/heads/main/guessing_game.py"
+VERSION_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/refs/heads/main/version"
+
+def check_for_update():
+    try:
+        latest_version = urllib.request.urlopen(VERSION_URL).read().decode().strip()
+        if latest_version > CURRENT_VERSION:
+            if messagebox.askyesno("Update Available", f"New version {latest_version} available. Update now?"):
+                urllib.request.urlretrieve(CODE_URL, "guessing_game.py")
+                messagebox.showinfo("Update Complete", "Game updated! Please restart.")
+                sys.exit()
+    except Exception as e:
+        print(f"Update check failed: {e}")
 
 # Load progress
 def load_progress():
@@ -86,14 +103,10 @@ def show_hint():
 def hint_button_action():
     show_hint()
 
-# Trigger EXE build
-def build_exe():
-    subprocess.Popen(['build_exe.bat'], shell=True)
-
 window = tk.Tk()
 window.title("Number Guessing Game")
 window.configure(bg="#282c34")
-window.geometry('400x400')
+window.geometry('400x420')
 
 # Difficulty selection frame
 difficulty_frame = tk.Frame(window, bg='#282c34')
@@ -132,11 +145,11 @@ attempts_label.pack(pady=5)
 guesses_label = tk.Label(game_frame, text="Your guesses: []", bg="#3c4048", fg="#ffffff", font=("Arial", 10))
 guesses_label.pack(pady=5)
 
-# EXE build button (hidden if running as exe)
-if not getattr(sys, 'frozen', False):
-    build_button = tk.Button(window, text="Build EXE", command=build_exe, bg="#d19a66", fg="#ffffff", width=10)
-    build_button.pack(pady=10)
+# Version label at bottom
+version_label = tk.Label(window, text=f"Version: {CURRENT_VERSION}", bg="#282c34", fg="#ffffff", font=("Arial", 9))
+version_label.pack(side='bottom', pady=5)
 
 load_progress()
+check_for_update()
 reset_game()
 window.mainloop()
