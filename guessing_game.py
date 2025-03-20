@@ -5,19 +5,22 @@ import subprocess
 import os
 import sys
 import urllib.request
+import shutil
 
 # --- Auto-updater ---
-CURRENT_VERSION = "1.0.2"
-CODE_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/refs/heads/main/guessing_game.py"
-VERSION_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/refs/heads/main/version"
+CURRENT_VERSION = "1.0.3"
+EXE_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/main/guessing_game.exe"
+VERSION_URL = "https://raw.githubusercontent.com/Sharptooth396/number-guessing-game/main/version"
 
 def check_for_update():
     try:
         latest_version = urllib.request.urlopen(VERSION_URL).read().decode().strip()
         if latest_version > CURRENT_VERSION:
             if messagebox.askyesno("Update Available", f"New version {latest_version} available. Update now?"):
-                urllib.request.urlretrieve(CODE_URL, "guessing_game.py")
-                messagebox.showinfo("Update Complete", "Game updated! Please restart.")
+                urllib.request.urlretrieve(EXE_URL, "guessing_game_new.exe")
+                messagebox.showinfo("Update Downloaded", "Update downloaded! Restart to apply.")
+                os.rename(sys.executable, "guessing_game_old.exe")
+                shutil.move("guessing_game_new.exe", sys.executable)
                 sys.exit()
     except Exception as e:
         print(f"Update check failed: {e}")
